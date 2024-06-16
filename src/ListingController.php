@@ -38,10 +38,21 @@ class ListingController
                     echo json_encode($listing);
                     break;
                 case "PATCH":
-                    echo "update $id";
+                    $data = (array) json_decode(file_get_contents("php://input"), true);
+
+                    $errors = $this->getValidationErrors($data, false);
+
+                    if (!empty($errors)) {
+                        $this->respondUnprocessableEntity($errors);
+                        return;
+                    }
+
+                    $rows = $this->gateway->update($id, $data);
+                    echo json_encode(["message" => "Listing updated", "rows" => $rows]);
                     break;
                 case "DELETE":
-                    echo "delete $id";
+                    $rows = $this->gateway->delete($id);
+                    echo json_encode(["message" => "Listing removed", "rows" => $rows]);
                     break;
                 default:
                     $this->respondMethodNotAllowed("GET, PATCH, DELETE");
@@ -74,11 +85,11 @@ class ListingController
         echo json_encode(["message" => "Listing created", "id" => $id]);
     }
 
-    private function getValidationErrors(array $data): array
+    private function getValidationErrors(array $data, bool $is_new = true): array
     {
         $errors = [];
 
-        if (empty($data["name"])) {
+        if ($is_new && empty($data["name"])) {
             $errors[] = "Name is required";
         }
 
