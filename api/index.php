@@ -23,6 +23,8 @@ if ($resource != "listings") {
     exit;
 }
 
+$api_key = $_SERVER["HTTP_X_API_KEY"];
+
 header("content-type: application/json; charset=UTF-8");
 
 $database = new Database($_ENV["DB_HOST"], $_ENV["DB_NAME"], $_ENV["DB_USER"], $_ENV["DB_PASS"]);
