@@ -7,9 +7,18 @@ class ListingController
     }
     public function processRequest(string $method, ?string $id): void
     {
+        if (array_key_exists('user', $_GET)) {
+            $userQuery = $_GET["user"];
+        } else {
+            $userQuery = false;
+        }
         if ($id === null) {
             if ($method == 'GET') {
-                echo json_encode($this->gateway->getAll());
+                if ($userQuery) {
+                    echo json_encode($this->gateway->getAllFiltered($userQuery));
+                } else {
+                    echo json_encode($this->gateway->getAll());
+                }
             } elseif ($method == "POST") {
                 $data = (array) json_decode(file_get_contents("php://input"), true);
 

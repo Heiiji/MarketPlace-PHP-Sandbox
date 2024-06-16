@@ -17,6 +17,16 @@ class ListingGateway
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getAllFiltered(int $user_id): array
+    {
+        $sql = "SELECT * FROM listing WHERE user_id = :user_id ORDER BY name";
+        $state = $this->conn->prepare($sql);
+        $state->bindParam(":user_id", $user_id, PDO::PARAM_INT);
+        $state->execute();
+
+        return $state->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function get(string $id): array | false
     {
         $sql = "SELECT * FROM listing WHERE id = :id";
