@@ -2,20 +2,30 @@
 
 class ListingController
 {
+    public function __construct(private ListingGateway $gateway)
+    {
+    }
     public function processRequest(string $method, ?string $id): void
     {
         if ($id === null) {
             if ($method == 'GET') {
-                echo "index";
+                echo json_encode($this->gateway->getAll());
             } elseif ($method == "POST") {
                 echo "create";
             } else {
                 $this->respondMethodNotAllowed("GET, POST");
             }
         } else {
+            $listing = $this->gateway->get($id);
+
+            if ($listing === false) {
+                $this->respondNotFound($id);
+                return;
+            }
+
             switch ($method) {
                 case "GET":
-                    echo "show $id";
+                    echo json_encode($listing);
                     break;
                 case "PATCH":
                     echo "update $id";
@@ -34,5 +44,11 @@ class ListingController
     {
         http_response_code(405);
         header("Allow: $allowed_methods");
+    }
+
+    private function respondNotFound(string $id): void
+    {
+        http_response_code(404);
+        echo json_encode(["message" => "Listing with ID $id not found."]);
     }
 }

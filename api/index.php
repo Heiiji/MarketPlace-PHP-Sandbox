@@ -28,6 +28,7 @@ $database = new Database($_ENV["DB_HOST"], $_ENV["DB_NAME"], $_ENV["DB_USER"], $
 
 $database->getConnection();
 
-$controller = new ListingController;
+$listing_gateway = new ListingGateway($database);
+$controller = new ListingController($listing_gateway);
 
 $controller->processRequest($_SERVER['REQUEST_METHOD'], $id);
