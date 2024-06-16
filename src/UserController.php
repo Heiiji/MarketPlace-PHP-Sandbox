@@ -1,8 +1,8 @@
 <?php
 
-class ListingController
+class UserController
 {
-    public function __construct(private ListingGateway $gateway, private int $user_id)
+    public function __construct(private UserGateway $gateway, private int $user_id)
     {
     }
     public function processRequest(string $method, ?string $id): void
@@ -20,22 +20,22 @@ class ListingController
                     return;
                 }
 
-                $id = $this->gateway->create($this->user_id, $data);
+                $id = $this->gateway->create($data);
                 $this->respondCreated($id);
             } else {
                 $this->respondMethodNotAllowed("GET, POST");
             }
         } else {
-            $listing = $this->gateway->get($id);
+            $user = $this->gateway->get($id);
 
-            if ($listing === false) {
+            if ($user === false) {
                 $this->respondNotFound($id);
                 return;
             }
 
             switch ($method) {
                 case "GET":
-                    echo json_encode($listing);
+                    echo json_encode($user);
                     break;
                 case "PATCH":
                     $data = (array) json_decode(file_get_contents("php://input"), true);
@@ -47,12 +47,12 @@ class ListingController
                         return;
                     }
 
-                    $rows = $this->gateway->update($this->user_id, $id, $data);
-                    echo json_encode(["message" => "Listing updated", "rows" => $rows]);
+                    $rows = $this->gateway->update($id, $data);
+                    echo json_encode(["message" => "User updated", "rows" => $rows]);
                     break;
                 case "DELETE":
-                    $rows = $this->gateway->delete($this->user_id, $id);
-                    echo json_encode(["message" => "Listing removed", "rows" => $rows]);
+                    $rows = $this->gateway->delete($id);
+                    echo json_encode(["message" => "User removed", "rows" => $rows]);
                     break;
                 default:
                     $this->respondMethodNotAllowed("GET, PATCH, DELETE");
@@ -76,27 +76,29 @@ class ListingController
     private function respondNotFound(string $id): void
     {
         http_response_code(404);
-        echo json_encode(["message" => "Listing with ID $id not found."]);
+        echo json_encode(["message" => "User with ID $id not found."]);
     }
 
     private function respondCreated(string $id): void
     {
         http_response_code(201);
-        echo json_encode(["message" => "Listing created", "id" => $id]);
+        echo json_encode(["message" => "User created", "id" => $id]);
     }
 
     private function getValidationErrors(array $data, bool $is_new = true): array
     {
         $errors = [];
 
-        if ($is_new && empty($data["name"])) {
-            $errors[] = "Name is required";
+        if ($is_new && empty($data["username"])) {
+            $errors[] = "Username is required";
         }
 
-        if (empty($data["price"])) {
-            $errors[] = "Price is required";
-        } elseif (filter_var($data["price"], FILTER_VALIDATE_FLOAT) === false) {
-            $errors[] = "Price must be a float";
+        if ($is_new && empty($data["password"])) {
+            $errors[] = "Password is required";
+        }
+
+        if (!empty($data["age"]) && filter_var($data["age"], FILTER_VALIDATE_INT) === false) {
+            $errors[] = "Age must be a int";
         }
 
         return $errors;

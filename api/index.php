@@ -2,13 +2,7 @@
 
 declare(strict_types=1);
 
-require dirname(__DIR__) . "/vendor/autoload.php";
-
-set_error_handler("ErrorHandler::handleError");
-set_exception_handler("ErrorHandler::handleException");
-
-$dotenv = \Dotenv\Dotenv::createImmutable(dirname(__DIR__));
-$dotenv->load();
+require __DIR__ . '/bootstrap.php';
 
 $path =  parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
@@ -18,20 +12,30 @@ $resource = $parts[2];
 
 $id = $parts[3] ?? null;
 
-if ($resource != "listings") {
-    http_response_code(404);
+$database = new Database($_ENV["DB_HOST"], $_ENV["DB_NAME"], $_ENV["DB_USER"], $_ENV["DB_PASS"]);
+$database->getConnection();
+
+$user_gateway = new UserGateway($database);
+
+$auth = new Auth($user_gateway);
+if (!$auth->authenticateAPIKey()) {
     exit;
 }
 
-$api_key = $_SERVER["HTTP_X_API_KEY"];
-
-header("content-type: application/json; charset=UTF-8");
-
-$database = new Database($_ENV["DB_HOST"], $_ENV["DB_NAME"], $_ENV["DB_USER"], $_ENV["DB_PASS"]);
-
-$database->getConnection();
+$user_id = $auth->getUserId();
 
 $listing_gateway = new ListingGateway($database);
-$controller = new ListingController($listing_gateway);
+$listingController = new ListingController($listing_gateway, $user_id);
+$userController = new UserController($user_gateway, $user_id);
 
-$controller->processRequest($_SERVER['REQUEST_METHOD'], $id);
+switch ($resource) {
+    case "listings":
+        $listingController->processRequest($_SERVER['REQUEST_METHOD'], $id);
+        break;
+    case "users":
+        $userController->processRequest($_SERVER['REQUEST_METHOD'], $id);
+        break;
+    default:
+        http_response_code(404);
+        exit;
+}
