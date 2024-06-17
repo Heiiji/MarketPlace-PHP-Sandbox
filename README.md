@@ -1,4 +1,4 @@
-## PHP Sandbox to do some test with PHP as an API
+## PHP Sandbox to do some training with PHP as an API
 
 ### Requirements
  - PHP 8.0
