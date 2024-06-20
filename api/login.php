@@ -35,12 +35,9 @@ if (!password_verify($data["password"], $user["password_hash"])) {
     exit;
 }
 
-$payload = [
-    "sub" => $user["id"],
-    "name" => $user["username"],
-];
-
 $codec = new JWTCodec($_ENV['SECRET_KEY']);
-$access_token = $codec->encode($payload);
 
-echo json_encode(["access_token" => $access_token]);
+require __DIR__ . "/tokens.php";
+
+$refresh_token_gateway = new RefreshTokenGateway($database, $_ENV['SECRET_KEY']);
+$refresh_token_gateway->create($refresh_token, $refresh_token_expiry);

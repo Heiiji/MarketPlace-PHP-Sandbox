@@ -38,6 +38,10 @@ class JWTCodec
 
         $payload = json_decode($this->base64UrlDecode($matches["payload"]), true);
 
+        if ($payload["exp"] < time()) {
+            throw new TokenExpiredException();
+        }
+
         return $payload;
     }
 

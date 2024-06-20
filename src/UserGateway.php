@@ -28,7 +28,7 @@ class UserGateway
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function get(string $id): array | false
+    public function get(int $id): array | false
     {
         $sql = "SELECT * FROM user WHERE id = :id";
         $state = $this->conn->prepare($sql);
