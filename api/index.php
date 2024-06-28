@@ -25,9 +25,12 @@ if (!$auth->authenticateAccessToken()) {
 
 $user_id = $auth->getUserId();
 
+$cart_gateway = new CartGateway($database);
+
 $listing_gateway = new ListingGateway($database);
 $listingController = new ListingController($listing_gateway, $user_id);
 $userController = new UserController($user_gateway, $user_id);
+$cartController = new CartController($cart_gateway, $user_id);
 
 switch ($resource) {
     case "listings":
@@ -35,6 +38,9 @@ switch ($resource) {
         break;
     case "users":
         $userController->processRequest($_SERVER['REQUEST_METHOD'], $id);
+        break;
+    case "cart":
+        $cartController->processRequest($_SERVER['REQUEST_METHOD'], $id);
         break;
     default:
         http_response_code(404);
