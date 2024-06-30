@@ -1,14 +1,20 @@
 <?php
 
+namespace gateways;
+use PDO;
+
+use config\Database;
+
 class UserGateway
 {
     private PDO $conn;
+
     public function __construct(Database $database)
     {
         $this->conn = $database->getConnection();
     }
 
-    public function getByAPIKey(string $apiKey): array | false
+    public function getByAPIKey(string $apiKey): array|false
     {
         $sql = "SELECT * FROM user WHERE api_key = :api_key";
 
@@ -28,7 +34,7 @@ class UserGateway
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function get(int $id): array | false
+    public function get(int $id): array|false
     {
         $sql = "SELECT * FROM user WHERE id = :id";
         $state = $this->conn->prepare($sql);
@@ -111,7 +117,7 @@ class UserGateway
         return $state->rowCount();
     }
 
-    public function getByUsername(string $username): array | false
+    public function getByUsername(string $username): array|false
     {
         $sql = "SELECT * FROM user WHERE username = :username";
 

@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use config\Database;
+use gateways\RefreshTokenGateway;
+
 require __DIR__ . '/vendor/autoload.php';
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);

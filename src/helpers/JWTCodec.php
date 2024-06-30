@@ -1,11 +1,16 @@
 <?php
 
+namespace helpers;
+use exceptions\InvalidSignatureException;
+use exceptions\TokenExpiredException;
+
 class JWTCodec
 {
     public function __construct(private string $key)
     {
 
     }
+
     public function encode(array $payload): string
     {
         $header = json_encode([
@@ -26,14 +31,14 @@ class JWTCodec
     public function decode(string $token): array
     {
         if (preg_match("/^(?<header>.+)\.(?<payload>.+)\.(?<sign>.+)$/", $token, $matches) !== 1) {
-            Throw new InvalidArgumentException("Invalid JWT format");
+            throw new InvalidArgumentException("Invalid JWT format");
         }
 
         $sign = hash_hmac('sha256', $matches["header"] . "." . $matches["payload"], $this->key, true);
         $token_sign = $this->base64UrlDecode($matches["sign"]);
 
         if (!hash_equals($sign, $token_sign)) {
-            Throw new InvalidSignatureException();
+            throw new InvalidSignatureException();
         }
 
         $payload = json_decode($this->base64UrlDecode($matches["payload"]), true);

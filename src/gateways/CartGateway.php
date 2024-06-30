@@ -1,14 +1,20 @@
 <?php
 
+namespace gateways;
+use PDO;
+
+use config\Database;
+
 class CartGateway
 {
     private PDO $conn;
+
     public function __construct(Database $database)
     {
         $this->conn = $database->getConnection();
     }
 
-    public function get(string $id): array | false
+    public function get(string $id): array|false
     {
         $sql = "SELECT * FROM cart WHERE id = :id";
         $state = $this->conn->prepare($sql);
@@ -20,7 +26,7 @@ class CartGateway
         return $data;
     }
 
-    public function getUserCart(int $user_id): array | false
+    public function getUserCart(int $user_id): array|false
     {
         $sql = "SELECT * FROM listing INNER JOIN cart c ON listing.id = c.listing_id AND c.user_id = :id";
         $state = $this->conn->prepare($sql);

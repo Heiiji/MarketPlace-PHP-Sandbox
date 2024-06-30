@@ -1,10 +1,17 @@
 <?php
 
+namespace helpers;
+
+use exceptions\TokenExpiredException;
+use gateways\UserGateway;
+
 class Auth
 {
     private int $user_id;
+
     public function __construct(private UserGateway $user_gateway, private JWTCodec $codec)
-    {}
+    {
+    }
 
     public function authenticateAPIKey(): bool
     {

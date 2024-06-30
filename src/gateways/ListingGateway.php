@@ -1,8 +1,14 @@
 <?php
 
+namespace gateways;
+use PDO;
+
+use config\Database;
+
 class ListingGateway
 {
     private PDO $conn;
+
     public function __construct(Database $database)
     {
         $this->conn = $database->getConnection();
@@ -27,7 +33,7 @@ class ListingGateway
         return $state->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function get(string $id): array | false
+    public function get(string $id): array|false
     {
         $sql = "SELECT * FROM listing WHERE id = :id";
         $state = $this->conn->prepare($sql);

@@ -8,6 +8,7 @@
  * phpdotenv
  * dump-autoload
  * guzzlehttp/guzzle
+ * nikic/fast-route
 
 ## Installation
 For running this example, you need to install `omise-php` library before. It can be done by two different methods:

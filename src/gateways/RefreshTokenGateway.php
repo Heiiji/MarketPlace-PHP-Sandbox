@@ -1,5 +1,10 @@
 <?php
 
+namespace gateways;
+use PDO;
+
+use config\Database;
+
 class RefreshTokenGateway
 {
     private PDO $conn;
@@ -35,7 +40,7 @@ class RefreshTokenGateway
         return $stmt->rowCount();
     }
 
-    public function getByToken(string $token): array | false
+    public function getByToken(string $token): array|false
     {
         $hash = hash_hmac('sha256', $token, $this->key);
 

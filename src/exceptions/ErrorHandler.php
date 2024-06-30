@@ -1,16 +1,18 @@
 <?php
 
+namespace exceptions;
 class ErrorHandler
 {
     public static function handleError(
-        int $errno,
+        int    $errno,
         string $errstr,
         string $errfile,
-        int $errline,
+        int    $errline,
     ): void
     {
-        throw new ErrorException($errstr, $errno, $errfile, $errline);
+        throw new ErrorException($errstr, $errno, 1, $errfile, $errline);
     }
+
     public static function handleException(Throwable $exception): void
     {
         http_response_code(500);

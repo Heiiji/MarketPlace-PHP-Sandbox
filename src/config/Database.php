@@ -1,13 +1,19 @@
 <?php
 
-class Database {
-    private ?PDO $conn  = null;
+namespace config;
+use PDO;
+
+class Database
+{
+    private ?PDO $conn = null;
+
     public function __construct(
         private string $host,
         private string $name,
         private string $user,
         private string $password
-    ) {
+    )
+    {
 
     }
 

@@ -2,6 +2,11 @@
 
 declare(strict_types=1);
 
+use config\Database;
+use gateways\RefreshTokenGateway;
+use gateways\UserGateway;
+use helpers\JWTCodec;
+
 require __DIR__ . '/bootstrap.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

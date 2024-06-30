@@ -2,15 +2,25 @@
 
 declare(strict_types=1);
 
+use config\Database;
+use controllers\CartController;
+use controllers\ListingController;
+use controllers\UserController;
+use gateways\CartGateway;
+use gateways\ListingGateway;
+use gateways\UserGateway;
+use helpers\Auth;
+use helpers\JWTCodec;
+
 require __DIR__ . '/bootstrap.php';
 
 $path =  parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 $parts = explode('/', $path);
 
-$resource = $parts[2];
+$resource = $parts[1];
 
-$id = $parts[3] ?? null;
+$id = $parts[2] ?? null;
 
 $database = new Database($_ENV["DB_HOST"], $_ENV["DB_NAME"], $_ENV["DB_USER"], $_ENV["DB_PASS"]);
 $database->getConnection();
@@ -24,6 +34,12 @@ if (!$auth->authenticateAccessToken()) {
 }
 
 $user_id = $auth->getUserId();
+
+require __DIR__ . '/src/routes/api.php';
+exit;
+
+
+
 
 $cart_gateway = new CartGateway($database);
 
