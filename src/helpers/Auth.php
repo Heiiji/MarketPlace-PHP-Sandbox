@@ -2,15 +2,23 @@
 
 namespace helpers;
 
+use config\Database;
 use exceptions\TokenExpiredException;
 use gateways\UserGateway;
 
 class Auth
 {
     private int $user_id;
+    private UserGateway $user_gateway;
+    private JWTCodec $codec;
 
-    public function __construct(private UserGateway $user_gateway, private JWTCodec $codec)
+    public function __construct()
     {
+        $database = new Database($_ENV["DB_HOST"], $_ENV["DB_NAME"], $_ENV["DB_USER"], $_ENV["DB_PASS"]);
+        $database->getConnection();
+
+        $this->user_gateway = new UserGateway($database);
+        $this->codec = new JWTCodec($_ENV["SECRET_KEY"]);
     }
 
     public function authenticateAPIKey(): bool

@@ -26,8 +26,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $statement->bindValue(":age", $_POST["age"]);
 
     $statement->execute();
-
-    echo "Thanks for registering!, Your API key is : " . $api_key;
 }
 
 ?>

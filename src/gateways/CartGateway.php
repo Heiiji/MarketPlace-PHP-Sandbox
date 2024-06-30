@@ -26,7 +26,7 @@ class CartGateway
         return $data;
     }
 
-    public function getUserCart(int $user_id): array|false
+    public function getUserCart(int $user_id): array
     {
         $sql = "SELECT * FROM listing INNER JOIN cart c ON listing.id = c.listing_id AND c.user_id = :id";
         $state = $this->conn->prepare($sql);
@@ -35,7 +35,7 @@ class CartGateway
 
         $data = $state->fetch(PDO::FETCH_ASSOC);
 
-        return $data;
+        return $data ?: [];
     }
 
     public function addToCart(int $user_id, int $listing_id): string

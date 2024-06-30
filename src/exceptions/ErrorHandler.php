@@ -1,6 +1,10 @@
 <?php
 
 namespace exceptions;
+
+use ErrorException;
+use Throwable;
+
 class ErrorHandler
 {
     public static function handleError(
