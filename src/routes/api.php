@@ -7,6 +7,7 @@ use function FastRoute\simpleDispatcher;
 
 require_once __DIR__ . '/../controllers/AuthController.php';
 require_once __DIR__ . '/../controllers/CartController.php';
+require_once __DIR__ . '/../controllers/EntitlementController.php';
 require_once __DIR__ . '/../controllers/ListingController.php';
 require_once __DIR__ . '/../controllers/UserController.php';
 
@@ -27,6 +28,12 @@ $dispatcher = simpleDispatcher(function(RouteCollector $r) {
     $r->addRoute('GET', '/cart', ['controllers\CartController', 'get', Sections::PROTECTED]);
     $r->addRoute('POST', '/cart', ['controllers\CartController', 'add', Sections::PROTECTED]);
     $r->addRoute('DELETE', '/cart/{id:\d+}', ['controllers\CartController', 'remove', Sections::PROTECTED]);
+    $r->addRoute('POST', '/checkout', ['controllers\CartController', 'checkout', Sections::PROTECTED]);
+
+    // Entitlement routes
+    $r->addRoute('GET', '/entitlement', ['controllers\EntitlementController', 'get', Sections::PROTECTED]);
+    $r->addRoute('POST', '/entitlement', ['controllers\EntitlementController', 'add', Sections::PROTECTED]);
+    $r->addRoute('DELETE', '/entitlement/{id:\d+}', ['controllers\EntitlementController', 'remove', Sections::PROTECTED]);
 
     // Listing routes
     $r->addRoute('GET', '/listings', ['controllers\ListingController', 'getAll', Sections::PUBLIC]);

@@ -2,25 +2,22 @@
 
 namespace controllers;
 use config\Database;
-use gateways\CartGateway;
 use gateways\EntitlementGateway;
 
-class CartController
+class EntitlementController
 {
-    private CartGateway $gateway;
-    private EntitlementGateway $entitlement_gateway;
+    private EntitlementGateway $gateway;
 
     public function __construct(private int $user_id)
     {
         $database = new Database($_ENV["DB_HOST"], $_ENV["DB_NAME"], $_ENV["DB_USER"], $_ENV["DB_PASS"]);
         $database->getConnection();
-        $this->gateway = new CartGateway($database);
-        $this->entitlement_gateway = new EntitlementGateway($database);
+        $this->gateway = new EntitlementGateway($database);
     }
 
     public function get(): void
     {
-        echo json_encode($this->gateway->getUserCart($this->user_id));
+        echo json_encode($this->gateway->getUserEntitlement($this->user_id));
     }
 
     public function add(): void
@@ -34,7 +31,7 @@ class CartController
             return;
         }
 
-        $this->gateway->addToCart($this->user_id, $data["listing_id"]);
+        $this->gateway->addEntitlement($this->user_id, $data["listing_id"]);
         $this->respondCreated();
     }
 
@@ -50,13 +47,6 @@ class CartController
         }
         $rows = $this->gateway->delete($id);
         echo json_encode(["message" => "Cart element removed", "rows" => $rows]);
-    }
-
-    public function checkout(): void
-    {
-        $listings = $this->gateway->getUserCart($this->user_id);
-        $this->gateway->clearUserCart($this->user_id);
-        $this->entitlement_gateway->addEntitlements($listings);
     }
 
     private function respondUnprocessableEntity(array $errors): void

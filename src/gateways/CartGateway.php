@@ -28,12 +28,12 @@ class CartGateway
 
     public function getUserCart(int $user_id): array
     {
-        $sql = "SELECT * FROM listing INNER JOIN cart c ON listing.id = c.listing_id AND c.user_id = :id";
+        $sql = "SELECT * FROM cart INNER JOIN listing l ON l.id = cart.listing_id WHERE cart.user_id = :id";
         $state = $this->conn->prepare($sql);
         $state->bindParam(":id", $user_id, PDO::PARAM_INT);
         $state->execute();
 
-        $data = $state->fetch(PDO::FETCH_ASSOC);
+        $data = $state->fetchAll(PDO::FETCH_ASSOC);
 
         return $data ?: [];
     }
@@ -41,7 +41,7 @@ class CartGateway
     public function addToCart(int $user_id, int $listing_id): string
     {
         $sql = "INSERT INTO cart (listing_id, user_id, created_at)
-            VALUES (:listing_id, :user_id, :created_at)";
+            VALUES (:listing_id, :user_id, :created_at) ON DUPLICATE KEY UPDATE created_at = VALUES(created_at)";
 
         $statement = $this->conn->prepare($sql);
         $statement->bindValue(":listing_id", $listing_id);
@@ -62,6 +62,18 @@ class CartGateway
 
         $state = $this->conn->prepare($sql);
         $state->bindParam(":id", $id, PDO::PARAM_INT);
+
+        $state->execute();
+
+        return $state->rowCount();
+    }
+
+    public function clearUserCart(string $user_id): int
+    {
+        $sql = "DELETE FROM cart WHERE user_id = :id";
+
+        $state = $this->conn->prepare($sql);
+        $state->bindParam(":id", $user_id, PDO::PARAM_INT);
 
         $state->execute();
 
