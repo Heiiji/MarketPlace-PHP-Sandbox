@@ -3,7 +3,6 @@
 namespace Controllers;
 
 use config\Database;
-use helpers\JWTCodec;
 use PDO;
 use PDOStatement;
 use PHPUnit\Framework\MockObject\MockObject;
