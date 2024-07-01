@@ -44,14 +44,10 @@ class CartGateway
             VALUES (:listing_id, :user_id, :created_at) ON DUPLICATE KEY UPDATE created_at = VALUES(created_at)";
 
         $statement = $this->conn->prepare($sql);
-        $statement->bindValue(":listing_id", $listing_id);
-
-        $statement->bindValue(":user_id", $user_id);
 
         $date = time();
-        $statement->bindValue(":created_at", $date);
 
-        $statement->execute();
+        $statement->execute(array(':listing_id' => $listing_id, ':user_id' => $user_id, ':created_at' => $date));
 
         return $this->conn->lastInsertId();
     }

@@ -21,9 +21,12 @@ class CartController
         echo json_encode($this->gateway->getUserCart($this->user_id));
     }
 
-    public function add(): void
+    public function add(array $data): void
     {
-        $data = (array)json_decode(file_get_contents("php://input"), true);
+        $len = count($data);
+        if ($len === 0) {
+            $data = (array)json_decode(file_get_contents("php://input"), true);
+        }
 
         $errors = $this->getValidationErrors($data);
 
