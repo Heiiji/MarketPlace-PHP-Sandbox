@@ -9,6 +9,7 @@
  * dump-autoload
  * guzzlehttp/guzzle
  * nikic/fast-route
+ * phpunit/phpunit
 
 ## Installation
 For running this example, you need to install libraries before:
@@ -22,4 +23,13 @@ After composer is installed, Then run the following command to install libraries
 
 ```
 composer install
+```
+
+## Unit Testing
+I use phpunit for unit testing. There are written in `tests` folder.
+
+### Start tests
+
+```
+./vendor/bin/phpunit
 ```

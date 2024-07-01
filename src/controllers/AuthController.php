@@ -2,6 +2,7 @@
 
 namespace controllers;
 use config\Database;
+use Exception;
 use gateways\RefreshTokenGateway;
 use gateways\UserGateway;
 use helpers\JWTCodec;
@@ -11,21 +12,22 @@ class AuthController
     private UserGateway $gateway;
     private RefreshTokenGateway $refresh_token_gateway;
 
-    public function __construct()
+    public function __construct(private Database $database)
     {
-        $database = new Database($_ENV["DB_HOST"], $_ENV["DB_NAME"], $_ENV["DB_USER"], $_ENV["DB_PASS"]);
-        $database->getConnection();
         $this->gateway = new UserGateway($database);
         $this->refresh_token_gateway = new RefreshTokenGateway($database, $_ENV['SECRET_KEY']);
     }
 
-    public function login() {
-        $data = (array)json_decode(file_get_contents("php://input"), true);
+    public function login(array $data) {
+        $len = count($data);
+        if ($len === 0) {
+            $data = (array)json_decode(file_get_contents("php://input"), true);
+        }
 
         if (!array_key_exists('username', $data) || !array_key_exists('password', $data)) {
             http_response_code(400);
             echo json_encode(["message" => "Missing login credentials"]);
-            exit;
+            return;
         }
 
         $user = $this->gateway->getByUsername($data["username"]);
@@ -33,13 +35,13 @@ class AuthController
         if ($user === false) {
             http_response_code(401);
             echo json_encode(["message" => "Invalid login credentials"]);
-            exit;
+            return;
         }
 
         if (!password_verify($data["password"], $user["password_hash"])) {
             http_response_code(401);
             echo json_encode(["message" => "Invalid login credentials"]);
-            exit;
+            return;
         }
 
         $codec = new JWTCodec($_ENV['SECRET_KEY']);
@@ -49,8 +51,11 @@ class AuthController
         $this->refresh_token_gateway->create($refresh_token, $refresh_token_expiry);
     }
 
-    public function refreshToken() {
-        $data = (array)json_decode(file_get_contents("php://input"), true);
+    public function refreshToken(array $data) {
+        $len = count($data);
+        if ($len === 0) {
+            $data = (array)json_decode(file_get_contents("php://input"), true);
+        }
 
         if (!array_key_exists('token', $data)) {
             http_response_code(400);
@@ -64,16 +69,12 @@ class AuthController
         } catch (Exception) {
             http_response_code(400);
             echo json_encode(["message" => "Invalid token"]);
-            exit;
+            return;
         }
 
         $user_id = $payload['sub'];
 
-        $database = new Database($_ENV['DB_HOST'], $_ENV['DB_NAME'], $_ENV['DB_USER'], $_ENV['DB_PASS']);
-
-        $refresh_token_gateway = new RefreshTokenGateway($database, $_ENV['SECRET_KEY']);
-
-        $refresh_token = $refresh_token_gateway->getByToken($data["token"]);
+        $refresh_token = $this->refresh_token_gateway->getByToken($data["token"]);
 
         if ($refresh_token === false) {
             http_response_code(400);
@@ -81,7 +82,7 @@ class AuthController
             exit;
         }
 
-        $user_gateway = new UserGateway($database);
+        $user_gateway = new UserGateway($this->database);
 
         $user = $user_gateway->get($user_id);
 
@@ -93,8 +94,8 @@ class AuthController
 
         require __DIR__ . "/../helpers/tokens.php";
 
-        $refresh_token_gateway->delete($data["token"]);
-        $refresh_token_gateway->create($refresh_token, $refresh_token_expiry);
+        $this->refresh_token_gateway->delete($data["token"]);
+        $this->refresh_token_gateway->create($refresh_token, $refresh_token_expiry);
     }
 
     public function logout() {

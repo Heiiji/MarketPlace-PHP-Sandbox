@@ -8,10 +8,8 @@ class ListingController
 {
     private ListingGateway $gateway;
 
-    public function __construct(private int $user_id)
+    public function __construct(private Database $database, private int $user_id)
     {
-        $database = new Database($_ENV["DB_HOST"], $_ENV["DB_NAME"], $_ENV["DB_USER"], $_ENV["DB_PASS"]);
-        $database->getConnection();
         $this->gateway = new ListingGateway($database);
     }
 

@@ -3,6 +3,7 @@
 namespace helpers;
 use exceptions\InvalidSignatureException;
 use exceptions\TokenExpiredException;
+use InvalidArgumentException;
 
 class JWTCodec
 {

@@ -1,5 +1,6 @@
 <?php
 
+use config\Database;
 use FastRoute\RouteCollector;
 use helpers\Auth;
 use helpers\Sections;
@@ -31,7 +32,7 @@ $dispatcher = simpleDispatcher(function(RouteCollector $r) {
     $r->addRoute('POST', '/checkout', ['controllers\CartController', 'checkout', Sections::PROTECTED]);
 
     // Entitlement routes
-    $r->addRoute('GET', '/entitlement', ['controllers\EntitlementController', 'get', Sections::PROTECTED]);
+    $r->addRoute('GET', '/entitlements', ['controllers\EntitlementController', 'get', Sections::PROTECTED]);
     $r->addRoute('POST', '/entitlement', ['controllers\EntitlementController', 'add', Sections::PROTECTED]);
     $r->addRoute('DELETE', '/entitlement/{id:\d+}', ['controllers\EntitlementController', 'remove', Sections::PROTECTED]);
 
@@ -64,6 +65,9 @@ switch ($routeInfo[0]) {
         echo json_encode(['error' => 'Method Not Allowed']);
         break;
     case FastRoute\Dispatcher::FOUND:
+        $database = new Database($_ENV["DB_HOST"], $_ENV["DB_NAME"], $_ENV["DB_USER"], $_ENV["DB_PASS"]);
+        $database->getConnection();
+
         $handler = $routeInfo[1];
         $vars = $routeInfo[2];
         [$class, $method, $section] = $handler;
@@ -77,7 +81,7 @@ switch ($routeInfo[0]) {
             $user_id = $auth->getUserId();
         }
 
-        $controller = new $class($user_id);
+        $controller = new $class($database, $user_id);
         $controller->$method($vars);
         break;
 }

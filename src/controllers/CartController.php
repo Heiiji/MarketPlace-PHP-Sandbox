@@ -10,10 +10,8 @@ class CartController
     private CartGateway $gateway;
     private EntitlementGateway $entitlement_gateway;
 
-    public function __construct(private int $user_id)
+    public function __construct(private Database $database, private int $user_id)
     {
-        $database = new Database($_ENV["DB_HOST"], $_ENV["DB_NAME"], $_ENV["DB_USER"], $_ENV["DB_PASS"]);
-        $database->getConnection();
         $this->gateway = new CartGateway($database);
         $this->entitlement_gateway = new EntitlementGateway($database);
     }
@@ -56,7 +54,7 @@ class CartController
     {
         $listings = $this->gateway->getUserCart($this->user_id);
         $this->gateway->clearUserCart($this->user_id);
-        $this->entitlement_gateway->addEntitlements($listings);
+        $this->entitlement_gateway->addEntitlements($listings, $this->user_id);
     }
 
     private function respondUnprocessableEntity(array $errors): void

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<phpunit colors="true">
+    <testsuite name="Automated tests">
+        <directory>./tests</directory>
+    </testsuite>
+    <php>
+        <env name="SECRET_KEY" value="fakeApiKey" />
+    </php>
+</phpunit>
