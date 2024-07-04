@@ -1,6 +1,6 @@
 <?php
 
-namespace Controllers;
+namespace controllers;
 
 use config\Database;
 use PDO;
@@ -40,7 +40,7 @@ class UserControllerTest extends TestCase {
         $this->mockDb->method('getConnection')->willReturn($mockPdo);
 
         // Instanciation du contrôleur avec le mock de la base de données
-        $this->userController = new UserController($this->mockDb);
+        $this->userController = new UserController($this->mockDb, 1);
     }
 
     public function testGetUser() {

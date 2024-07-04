@@ -5,6 +5,7 @@ namespace helpers;
 use config\Database;
 use exceptions\TokenExpiredException;
 use gateways\UserGateway;
+use InvalidArgumentException;
 
 class Auth
 {
