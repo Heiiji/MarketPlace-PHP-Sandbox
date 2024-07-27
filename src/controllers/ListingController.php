@@ -28,9 +28,12 @@ class ListingController
         }
     }
 
-    public function create(): void
+    public function create(array $data): void
     {
-        $data = (array)json_decode(file_get_contents("php://input"), true);
+        $len = count($data);
+        if ($len === 0) {
+            $data = (array)json_decode(file_get_contents("php://input"), true);
+        }
 
         $errors = $this->getValidationErrors($data);
 

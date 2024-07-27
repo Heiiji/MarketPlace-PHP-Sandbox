@@ -17,10 +17,12 @@ class ListingGateway
     public function getAll(): array
     {
         $sql = "SELECT * FROM listing ORDER BY name";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
 
-        $stmt = $this->conn->query($sql);
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $data ?: [];
     }
 
     public function getAllFiltered(int $user_id): array
